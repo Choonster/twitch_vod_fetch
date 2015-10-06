@@ -32,16 +32,16 @@ easier to pick timespan to download properly).
 
 General usage examples (wrapped):
 ```
-  % twitch_vod_fetch \
-    http://www.twitch.tv/starcraft/v/15655862 sc2_wcs_ro8 \
-    http://www.twitch.tv/starcraft/v/15831152 sc2_wcs_ro4 \
-    http://www.twitch.tv/starcraft/v/15842540 sc2_wcs_finals \
+  > python twitch_vod_fetch.py ^
+    http://www.twitch.tv/starcraft/v/15655862 sc2_wcs_ro8 ^
+    http://www.twitch.tv/starcraft/v/15831152 sc2_wcs_ro4 ^
+    http://www.twitch.tv/starcraft/v/15842540 sc2_wcs_finals ^
     http://www.twitch.tv/starcraft/v/15867047 sc2_wcs_lotv
 
-  % twitch_vod_fetch -x 120/15:00 \
+  % python twitch_vod_fetch.py -x 120/15:00 ^
     http://www.twitch.tv/redbullesports/v/13263504 sc2_rb_p01_preview
 
-  % twitch_vod_fetch -s 4:22 -l 2:00 \
+  % python twitch_vod_fetch.py -s 4:22 -l 2:00 ^
     http://www.twitch.tv/redbullesports/v/13263504 sc2_rb_p01_picked_2h_chunk
 ```
 
