@@ -112,15 +112,26 @@ def req_jrpc(url, method, *params, **req_kws):
 def vod_fetch(url, file_prefix,
 		start_delay=None, max_length=None, scatter=None,
 		ytdl_opts=None, aria2c_opts=None,
-		verbose=False, keep_tempfiles=False, dl_info_suffix=None ):
-	dst_file = '{}.mp4'.format(file_prefix)
+		output_format=None, verbose=False, keep_tempfiles=False, dl_info_suffix=None ):
+	
+	start_delay = start_delay or 0
+	vod_cache = ft.partial(VodFileCache, file_prefix)
+	
+	with vod_cache('filename') as vc:
+		dst_file = vc.cached
+		if not dst_file:
+			cmd = ['youtube-dl']
+			if verbose: cmd.append('--verbose')
+			cmd = cmd + ['--get-filename'] + (ytdl_opts or list())
+			if output_format: cmd = cmd + ['--output', output_format]
+			cmd = cmd + [url]
+			log.debug('Running "youtube-dl --get-filename" command: %s', ' '.join(cmd))
+			dst_file = vc.update(subprocess.check_output(cmd, close_fds=not mswindows).strip())
+	
 	if exists(dst_file):
 		log.info('--- Skipping download for existing file: %s (rename/remove it to force)', dst_file)
 		return
 	log.info('--- Downloading VoD %s (url: %s)%s', file_prefix, url, dl_info_suffix or '')
-
-	start_delay = start_delay or 0
-	vod_cache = ft.partial(VodFileCache, file_prefix)
 
 	with vod_cache('m3u8.url') as vc:
 		url_pls = vc.cached
@@ -359,7 +370,6 @@ def vod_fetch(url, file_prefix,
 	assert sorted(chunks) == chunks
 
 	log.info('Concatenating %s chunk files...', len(chunks))
-	dst_file = '{}.mp4'.format(file_prefix)
 
 	## Simple "cat" works for players like vlc and mpv, with minor seek inprecision
 	if not exists(dst_file):
@@ -384,7 +394,7 @@ def vod_fetch(url, file_prefix,
 
 	if not keep_tempfiles:
 		tmp_files = list(it.chain(( vod_cache(ext).path for ext in
-				['m3u8.url', 'm3u8.ua', 'm3u8', 'rpc_key', 'rpc_port', 'gids'] ), chunks))
+				['filename', 'm3u8.url', 'm3u8.ua', 'm3u8', 'rpc_key', 'rpc_port', 'gids'] ), chunks))
 		log.debug('Cleaning up temporary files (count: %s)...', len(tmp_files))
 		for p in tmp_files: os.unlink(p)
 
@@ -403,13 +413,19 @@ def main(args=None):
 
 	parser.add_argument('-y', '--ytdl-opts',
 		action='append', metavar='opts',
-		help='Extra opts for youtube-dl --get-url command.'
+		help='Extra opts for youtube-dl --get-url and --get-filename commands.'
 			' Will be split on spaces, unless option is used multiple times.')
 	parser.add_argument('-a', '--aria2c-opts',
 		action='append', metavar='opts',
 		help='Extra opts for aria2c command.'
 			' Will be split on spaces, unless option is used multiple times.')
 
+	parser.add_argument('-o', '--output-format',
+		metavar='output_format',
+		help='Output file name template. Passed to youtube-dl --get-filename'
+				' as the --output argument to get the final file name for the video.'
+			' If not specified, youtube-dl\'s default format will be used.'
+			' If multiple url/prefix args are specified, this option will be applied to all of them.')
 	parser.add_argument('-s', '--start-pos',
 		metavar='[[hours:]minutes:]seconds',
 		help='Only download video chunks after specified start position.'
@@ -459,7 +475,7 @@ def main(args=None):
 		start_delay=parse_pos_spec(opts.start_pos) if opts.start_pos else 0,
 		max_length=opts.length and parse_pos_spec(opts.length),
 		scatter=scatter, ytdl_opts=ytdl_opts, aria2c_opts=aria2c_opts,
-		verbose=opts.debug, keep_tempfiles=opts.keep_tempfiles )
+		output_format=opts.output_format, verbose=opts.debug, keep_tempfiles=opts.keep_tempfiles )
 
 	it_adjacent = lambda seq, n: zip(*([iter(seq)] * n))
 	vod_queue, args = list(),\
