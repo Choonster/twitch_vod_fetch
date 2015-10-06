@@ -38,10 +38,10 @@ General usage examples (wrapped):
     http://www.twitch.tv/starcraft/v/15842540 sc2_wcs_finals ^
     http://www.twitch.tv/starcraft/v/15867047 sc2_wcs_lotv
 
-  % python twitch_vod_fetch.py -x 120/15:00 ^
+  > python twitch_vod_fetch.py -x 120/15:00 ^
     http://www.twitch.tv/redbullesports/v/13263504 sc2_rb_p01_preview
 
-  % python twitch_vod_fetch.py -s 4:22 -l 2:00 ^
+  > python twitch_vod_fetch.py -s 4:22 -l 2:00 ^
     http://www.twitch.tv/redbullesports/v/13263504 sc2_rb_p01_picked_2h_chunk
 ```
 
