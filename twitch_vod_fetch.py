@@ -128,9 +128,14 @@ def vod_fetch(url, file_prefix,
 			log.debug('Running "youtube-dl --get-filename" command: %s', ' '.join(cmd))
 			dst_file = vc.update(subprocess.check_output(cmd, close_fds=not mswindows).strip())
 	
-	if exists(dst_file):
-		log.info('--- Skipping download for existing file: %s (rename/remove it to force)', dst_file)
-		return
+		if exists(dst_file):
+			log.info('--- Skipping download for existing file: %s (rename/remove it to force)', dst_file)
+		
+			if not keep_tempfiles:
+				os.unlink(vc.path)
+		
+			return
+			
 	log.info('--- Downloading VoD %s (url: %s)%s', file_prefix, url, dl_info_suffix or '')
 
 	with vod_cache('m3u8.url') as vc:
