@@ -5,7 +5,7 @@ from __future__ import print_function
 import itertools as it, operator as op, functools as ft
 from collections import OrderedDict
 from contextlib import contextmanager, closing
-from os.path import exists, dirname
+from os.path import exists, dirname, isdir
 import subprocess, tempfile, time, glob, socket
 import os, sys, re, json, types, base64
 import shutil
@@ -135,7 +135,15 @@ def vod_fetch(url, file_prefix,
 				os.unlink(vc.path)
 		
 			return
-			
+		else:
+			dst_dir = dirname(dst_file)
+			try:
+				os.makedirs(dst_dir)
+				log.info('--- Created directory %s', dst_dir)
+			except OSError:
+				if not isdir(dst_dir):
+					raise
+
 	log.info('--- Downloading VoD %s (url: %s)%s', file_prefix, url, dl_info_suffix or '')
 
 	with vod_cache('m3u8.url') as vc:
