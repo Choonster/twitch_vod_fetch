@@ -113,10 +113,10 @@ def vod_fetch(url, file_prefix,
 		start_delay=None, max_length=None, scatter=None,
 		ytdl_opts=None, aria2c_opts=None,
 		output_format=None, verbose=False, keep_tempfiles=False, dl_info_suffix=None ):
-	
+
 	start_delay = start_delay or 0
 	vod_cache = ft.partial(VodFileCache, file_prefix)
-	
+
 	with vod_cache('filename') as vc:
 		dst_file = vc.cached
 		if not dst_file:
@@ -127,13 +127,13 @@ def vod_fetch(url, file_prefix,
 			cmd = cmd + [url]
 			log.debug('Running "youtube-dl --get-filename" command: %s', ' '.join(cmd))
 			dst_file = vc.update(subprocess.check_output(cmd, close_fds=not mswindows).strip())
-	
+
 		if exists(dst_file):
 			log.info('--- Skipping download for existing file: %s (rename/remove it to force)', dst_file)
-		
+
 			if not keep_tempfiles:
 				os.unlink(vc.path)
-		
+
 			return
 		else:
 			dst_dir = dirname(dst_file)
@@ -192,7 +192,7 @@ def vod_fetch(url, file_prefix,
 		hook_done = '{}/.fetch_twitch_vod.{}.done.hook.bat'.format(os.environ['TEMP'], os.getpid())
 	else:
 		hook_done = '/tmp/.fetch_twitch_vod.{}.done.hook'.format(os.getpid())
-		
+
 	assert "'" not in file_prefix, file_prefix
 	assert "'" not in gids_done_path, gids_done_path
 	with open(hook_done, 'wb') as dst:
@@ -208,7 +208,7 @@ def vod_fetch(url, file_prefix,
 			sh_path = '/bin/dash'
 			if not exists(sh_path): sh_path = '/bin/ash' # busybox
 			if not exists(sh_path): sh_path = '/bin/sh'
-		
+
 			dst.write('\n'.join([
 				'#!{}'.format(sh_path),
 				'mv "$3" \'{}\'."$1".mp4.chunk\\'.format(file_prefix),
