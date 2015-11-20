@@ -4,7 +4,7 @@ Script to download any time slice of a twitch.tv VoD (video-on-demand).
 
 This is a Windows-comptatible version of Mike Kazantsev's [twitch_vod_fetch](https://github.com/mk-fg/fgtk#twitch-vod-fetch) script. This fork probably won't be actively maintained beyond my own needs.
 
-youtube-dl - the usual tool for the job - [doesn't support neither seeking to
+[youtube-dl][] - the usual tool for the job - [doesn't support neither seeking to
 time nor length limits](https://github.com/rg3/youtube-dl/issues/622), but does a good job of getting a VoD m3u8 playlist
 with chunks of the video (--get-url option).
 
@@ -14,7 +14,7 @@ inpractical, and there are occasional errors.
 
 So this wrapper grabs that playlist, skips chunks according to EXTINF tags
 (specifying exact time length of each) to satisfy --start-pos / --length, and
-then passes all these URLs to [aria2](http://aria2.sourceforge.net/) for parallel downloading with stuff
+then passes all these URLs to [aria2][] for parallel downloading with stuff
 like --max-concurrent-downloads=5, --max-connection-per-server=5,
 --lowest-speed-limit=100K, etc, also scheduling retries for any failed chunks a
 few times with delays.
@@ -25,10 +25,14 @@ Process is designed to tolerate Ctrl+C and resume from any point, and allows
 whatever tweaks (e.g. update url, change playlist, skip some chunks, etc), as it
 keeps all the state between these in plaintext files, plus all the actual pieces.
 
-Includes "--scatter" mode to download every-X-out-of-Y timespans instead of full
+Includes "--scatter" ("-x") mode to download every-X-out-of-Y timespans instead of full
 video, and has source timestamps on seeking in concatenated result (e.g. for
 `-x 2:00/15:00`, minute 3 in the video will display as "16:00", making it
 easier to pick timespan to download properly).
+
+"--create-part-file" ("-p") option allows to start playback before all chunks
+get downloaded, but can be less efficient when restarting whole process, as
+it'll be assembling new part-file from downloaded pieces each time.
 
 General usage examples (wrapped):
 ```
@@ -41,10 +45,18 @@ General usage examples (wrapped):
   > python twitch_vod_fetch.py -x 120/15:00 ^
     http://www.twitch.tv/redbullesports/v/13263504 sc2_rb_p01_preview
 
-  > python twitch_vod_fetch.py -s 4:22 -l 2:00 ^
+  > python twitch_vod_fetch.py -s 4:22:00 -l 2:00:00 ^
     http://www.twitch.tv/redbullesports/v/13263504 sc2_rb_p01_picked_2h_chunk
+	
+  > start /B python twitch_vod_fetch.py -p ^
+    http://www.twitch.tv/starcraft/v/24523048 sc2_blizzcon_finals ^
+    > sc2_blizzcon_finals.log 2>&1
+  > mpv sc2_blizzcon_finals.part.mp4
 ```
 
-Needs youtube-dl, requests and aria2.
+Needs [youtube-dl][], [requests](http://python-requests.org) and [aria2][].
 
 A bit more info on it can be found in [this twitchtv-vods-... blog post](http://blog.fraggod.net/2015/05/19/twitchtv-vods-video-on-demand-downloading-issues-and-fixes.html).
+
+[youtube-dl]: (https://rg3.github.io/youtube-dl/)
+[aria2]: (http://aria2.sourceforge.net/)
