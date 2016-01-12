@@ -125,7 +125,7 @@ def vod_fetch(url, file_prefix,
 		if verbose: cmd.append('--verbose')
 		cmd = cmd + ['--list-formats'] + (ytdl_opts or list()) + [url]
 		log.debug('Running "youtube-dl --list-formats" command: %s', ' '.join(cmd))
-		subprocess.check_call(cmd, close_fds=True)
+		subprocess.check_call(cmd, close_fds=not mswindows)
 		return
 
 	start_delay = start_delay or 0
