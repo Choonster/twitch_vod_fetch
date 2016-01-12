@@ -220,7 +220,6 @@ def vod_fetch(url, file_prefix,
 				' (gid: %s), re-queueing it: %s', gid_format(gid), chunk )
 			gids_done.remove(gid)
 
-	hook_done = None
 	if mswindows:
 		hook_done = '{}/.fetch_twitch_vod.{}.done.hook.bat'.format(os.environ['TEMP'], os.getpid())
 	else:
