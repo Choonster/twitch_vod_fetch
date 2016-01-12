@@ -128,8 +128,6 @@ def vod_fetch(url, file_prefix,
 		subprocess.check_call(cmd, close_fds=True)
 		return
 
-	dst_file_part = '{}.part.mp4'.format(file_prefix)
-
 	start_delay = start_delay or 0
 	vod_cache = ft.partial(VodFileCache, file_prefix)
 
@@ -160,6 +158,16 @@ def vod_fetch(url, file_prefix,
 				if not isdir(dst_dir):
 					raise
 
+	# Like string.replace, but replaces the rightmost occurrences of the substring `old` with `new`
+	# http://stackoverflow.com/a/2556252
+	def rreplace(s, old, new, occurrence):
+		li = s.rsplit(old, occurrence)
+		return new.join(li)
+	
+	dst_file_part = rreplace(dst_file, '.mp4', '.part.mp4', 1)
+	if dst_file_part == dst_file:
+		dst_file_part += '.part.mp4'
+	
 	log.info('--- Downloading VoD %s (url: %s)%s', file_prefix, url, dl_info_suffix or '')
 
 	with vod_cache('m3u8.url') as vc:
