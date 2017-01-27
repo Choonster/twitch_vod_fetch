@@ -586,9 +586,9 @@ def main(args=None):
 			prefix, url = url, prefix
 			log.warn( 'Looks like url/prefix args got'
 				' mixed-up, correcting that to prefix=%s url=%s', prefix, url )
-		if not re.search(r'^https?://[^/]+/[^/]+/v/', url):
+		if not re.search(r'^https?://[^/]+/videos/', url):
 			parser.error( 'Provided URL appears to be for the'
-				' unsupported VoD format (only /v/ VoDs are supported): {}'.format(url) )
+				' unsupported VoD format (only /videos/ VoDs are supported): {}'.format(url) )
 		vod_queue.append((url, prefix))
 
 	for n, (url, prefix) in enumerate(vod_queue, 1):
