@@ -1,5 +1,7 @@
 # twitch_vod_fetch
 
+## Discontinued - Use the [Choonster/fgtk](https://github.com/Choonster/fgtk#twitch-vod-fetch) repository instead.
+
 Script to download any time slice of a twitch.tv VoD (video-on-demand).
 
 This is a Windows-comptatible version of Mike Kazantsev's [twitch_vod_fetch](https://github.com/mk-fg/fgtk#twitch-vod-fetch) script. This fork probably won't be actively maintained beyond my own needs.
